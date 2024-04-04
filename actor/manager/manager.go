@@ -138,6 +138,9 @@ func (m *DefaultActorManagerContext) InvokeMethod(ctx context.Context, actorID, 
 		return nil, aerr
 	}
 	if len(returnValue) == 1 {
+		if err, ok := returnValue[0].Interface().(error); ok {
+			return []byte(err.Error()), actorErr.ErrActorInvokeFailed
+		}
 		return nil, actorErr.Success
 	}
 
@@ -152,7 +155,10 @@ func (m *DefaultActorManagerContext) InvokeMethod(ctx context.Context, actorID, 
 	}
 
 	if retErr != nil {
-		return nil, actorErr.ErrActorInvokeFailed
+		if err, ok := returnValue[0].Interface().(error); ok {
+			return []byte(err.Error()), actorErr.ErrActorInvokeFailed
+		}
+		return []byte(retErr.(error).Error()), actorErr.ErrActorInvokeFailed
 	}
 	rspData, err := m.serializer.Marshal(replyv.Interface())
 	if err != nil {

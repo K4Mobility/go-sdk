@@ -160,6 +160,11 @@ func (s *Server) registerBaseHandler() {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
+		if err == actorErr.ErrActorInvokeFailed {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(rspData)
+			return
+		}
 		if err != actorErr.Success {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

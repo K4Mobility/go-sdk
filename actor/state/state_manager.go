@@ -197,12 +197,16 @@ func (s *stateManagerCtx) Remove(ctx context.Context, stateName string) error {
 		})
 		return nil
 	}
-	if exist, err := s.stateAsyncProvider.ContainsContext(ctx, s.actorTypeName, s.actorID, stateName); err != nil && exist {
-		s.stateChangeTracker.Store(stateName, &ChangeMetadata{
-			Kind:  Remove,
-			Value: nil,
-		})
-	}
+	// if exist, err := s.stateAsyncProvider.ContainsContext(ctx, s.actorTypeName, s.actorID, stateName); err != nil && exist {
+	// 	s.stateChangeTracker.Store(stateName, &ChangeMetadata{
+	// 		Kind:  Remove,
+	// 		Value: nil,
+	// 	})
+	// }
+	s.stateChangeTracker.Store(stateName, &ChangeMetadata{
+		Kind:  Remove,
+		Value: nil,
+	})
 	return nil
 }
 

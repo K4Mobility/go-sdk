@@ -1,4 +1,4 @@
-module github.com/dapr/go-sdk
+module github.com/K4Mobility/go-sdk
 
 go 1.21.8
 

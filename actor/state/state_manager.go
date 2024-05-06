@@ -55,6 +55,10 @@ func (s *stateManager) Remove(stateName string) error {
 	return s.stateManagerCtx.Remove(context.Background(), stateName)
 }
 
+func (s *stateManager) ForceRemove(stateName string) error {
+	return s.stateManagerCtx.ForceRemove(context.Background(), stateName)
+}
+
 // Deprecated: use NewActorStateManagerContext instead.
 func (s *stateManager) Contains(stateName string) (bool, error) {
 	return s.stateManagerCtx.Contains(context.Background(), stateName)
@@ -197,12 +201,35 @@ func (s *stateManagerCtx) Remove(ctx context.Context, stateName string) error {
 		})
 		return nil
 	}
-	// if exist, err := s.stateAsyncProvider.ContainsContext(ctx, s.actorTypeName, s.actorID, stateName); err != nil && exist {
-	// 	s.stateChangeTracker.Store(stateName, &ChangeMetadata{
-	// 		Kind:  Remove,
-	// 		Value: nil,
-	// 	})
-	// }
+	if exist, err := s.stateAsyncProvider.ContainsContext(ctx, s.actorTypeName, s.actorID, stateName); err != nil && exist {
+		s.stateChangeTracker.Store(stateName, &ChangeMetadata{
+			Kind:  Remove,
+			Value: nil,
+		})
+	}
+	return nil
+}
+
+func (s *stateManagerCtx) ForceRemove(ctx context.Context, stateName string) error {
+	if stateName == "" {
+		return errors.New("state name can't be empty")
+	}
+	if val, ok := s.stateChangeTracker.Load(stateName); ok {
+		metadata := val.(*ChangeMetadata)
+		if metadata.Kind == Remove {
+			return nil
+		}
+		if metadata.Kind == Add {
+			s.stateChangeTracker.Delete(stateName)
+			return nil
+		}
+
+		s.stateChangeTracker.Store(stateName, &ChangeMetadata{
+			Kind:  Remove,
+			Value: nil,
+		})
+		return nil
+	}
 	s.stateChangeTracker.Store(stateName, &ChangeMetadata{
 		Kind:  Remove,
 		Value: nil,

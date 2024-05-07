@@ -189,6 +189,8 @@ type StateManager interface {
 	Set(stateName string, value any) error
 	// Remove is to remove state store with @stateName
 	Remove(stateName string) error
+	// Force Remove is to remove state store with @stateName
+	ForceRemove(stateName string) error
 	// Contains is to check if state store contains @stateName
 	Contains(stateName string) (bool, error)
 	// Save is to saves the state cache of this actor instance to state store component by calling api of daprd.
@@ -216,6 +218,8 @@ type StateManagerContext interface {
 	SetWithTTL(ctx context.Context, stateName string, value any, ttl time.Duration) error
 	// Remove is to remove state store with @stateName
 	Remove(ctx context.Context, stateName string) error
+	// Force Remove is to remove state store with @stateName
+	ForceRemove(ctx context.Context, stateName string) error
 	// Contains is to check if state store contains @stateName
 	Contains(ctx context.Context, stateName string) (bool, error)
 	// Save is to saves the state cache of this actor instance to state store component by calling api of daprd.
